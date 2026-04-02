@@ -1,5 +1,11 @@
 <?php
 require_once "../config.php";
+session_start();
+
+    if(!$_SESSION['user_id']){
+        echo "<script>window.location.href = './test_login.php';</script>";
+        exit;
+    }
 ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -145,7 +151,26 @@ require_once "../config.php";
         .comment-date {
             font-size: 0.9em;
             white-space: nowrap;
+            color: #777;
         }
+        .comment-writer {
+            color:#777;
+        }
+        .comment-write-block {
+            width: 90%;
+            outline-color: #777;
+            resize: none;
+        }
+        .comment-flex {
+            display: flex;
+            height: 10%;
+        }
+        .comment-write-btn {
+            background-color:#2196F3;
+            color: white;
+            width: 10%;
+        }
+
     </style>
 </head>
 
@@ -162,8 +187,14 @@ require_once "../config.php";
         </table>
     </div>
 
+    <div class="view-container comment-flex" id="view-container">
+        <textarea class="comment-write-block" placeholder="댓글의 내용을 작성해주세요."></textarea>
+        <button class="comment-write-btn" onclick="writeComment()">작성</button>
+    </div>
+
     <script>
         let post_seq = 0;
+        const user_id = "<?php echo $_SESSION['user_id']; ?>";
 
         window.onload = function() {
             // 게시글 번호를 파라미터 값으로 가져오기
@@ -208,7 +239,7 @@ require_once "../config.php";
                         <button class="delete-btn" onclick="deleteData()">삭제</button>
                     </div>
                 `;
-                        commentData(post_seq);
+                        commentData();
                         onOffStar(data.star_on_off);
                     } else {
                         alert(res.message);
@@ -234,10 +265,14 @@ require_once "../config.php";
         }
 
         // 댓글 불러오기 및 출력 함수
-        function commentData(post_seq) {
+        function commentData() {
             fetch('./api/test_comment_api.php', {
                 method: 'POST',
-                body:post_seq
+                body:JSON.stringify({
+                    'post_seq': post_seq,
+                    'func': 'read',
+                    'user_id': user_id
+                })
             }).then(res => res.json())
             .then(res => {
                 const comment = document.querySelector('.comment');
@@ -255,15 +290,36 @@ require_once "../config.php";
                                 <div class="comment-block">
                                     <div>
                                         <span class="comment-writer">${data.username}</span>
-                                        <span><br>${data.comment_content}</span>
+                                        <span><br>${data.comment_content.replace(/\n/g, '<br>')}</span>
                                     </div>
                                     <span class="comment-date">${data.comment_date}</span>
                                 </div>
                             </td>
                         </tr>`;
                     });
-                    console.log(html);
                     comment.innerHTML = html;
+                }
+            })
+        }
+
+        // 댓글 작성하기
+        function writeComment(){
+            const commentContent = document.querySelector('.comment-write-block').value;
+
+            fetch('./api/test_comment_api.php', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'post_seq' :post_seq,
+                    'func': 'write',
+                    'user_id': user_id,
+                    'comment_content' : commentContent
+                })
+            }).then(res => res.json())
+            .then(res => {
+                if(res.result == 'success') {
+                    window.location.reload();
+                } else {
+                    alert(res.message);
                 }
             })
         }

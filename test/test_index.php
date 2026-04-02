@@ -2,7 +2,7 @@
     require_once "../config.php";
     session_start();
     
-    if(!$_SESSION['username']){
+    if(!$_SESSION['user_id']){
         echo "<script>window.location.href = './test_login.php';</script>";
         exit;
     }
