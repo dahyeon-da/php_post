@@ -7,6 +7,7 @@ $content = $_POST['content'];
 $post_seq = $_POST['post_seq'];
 $org_file_name = $_POST['org_file_name'];
 $file_status = $_POST['file_status'];
+$star_on_off = $_POST['star_on_off'];
 $date = date('Y-m-d', time());
 $uploadDir = __DIR__ . '/uploads/';
 
@@ -36,6 +37,8 @@ function getUniqueFileName($uploadDir, $extension, $length = 10)
 if ($file_status == 'changed') {  // 파일이 변경되었을 때
     $file = $_FILES['file'];
 
+    print_r($file['name']);
+
     // 원본파일의 확장자 추출
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
 
@@ -62,8 +65,10 @@ if ($file_status == 'changed') {  // 파일이 변경되었을 때
     if ($file_resultData) {
         $resultData['file_result'] = true;
     } else if (!$file_resultData) {
-        $result['file_result'] = false;
+        $resultData['file_result'] = false;
     }
+} else {
+    $resultData['file_result'] = true;
 }
 
 $array = array(
@@ -71,18 +76,21 @@ $array = array(
     "writer" => $writer,
     "content" => $content,
     "date" => $date,
-    "post_seq" => $post_seq
+    "post_seq" => $post_seq, 
+    "star_on_off" => $star_on_off
 );
-$sql = "UPDATE post_table SET title = :title, writer = :writer, content = :content, date = :date WHERE post_seq = :post_seq;";
+$sql = "UPDATE post_table SET title = :title, writer = :writer, content = :content, star_on_off = :star_on_off, date = :date WHERE post_seq = :post_seq;";
 
 try {
     $post_resultData = $DB->update($sql, $array);
     $resultData['post_result'] = true;
 
     echo json_encode($resultData);
+    exit;
 } catch (Exception $e) {
     $resultData = array(
         "message" => $e
     );
     echo json_encode($resultData);
+    exit;
 }

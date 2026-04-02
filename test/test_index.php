@@ -55,6 +55,16 @@
         .write-btn:hover {
             background: #45a049;
         }
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+        .star {
+            color: #f44336;
+        }
+        #star-th {
+            width: 3%;
+        }
     </style>
 </head>
 <body>
@@ -68,6 +78,7 @@
         <thead>
             <tr>
                 <th>번호</th>
+                <th id="star-th"></th>
                 <th>제목</th>
                 <th>작성자</th>
                 <th>작성일</th>
@@ -95,16 +106,18 @@
             const displayArea = document.getElementById('boardList');
             let html = '';
             data.forEach((post, index) => {
+            const starIcon = (post.star_on_off == 1) ? '★' : '';
                 
             html +=   `
             <tr>
                 <td>${index + 1}</td>
+                <td class="star">${starIcon}</td>
                 <td><button type="button" onclick="goDetailView(${post.post_seq})" style="width: 100%; height: 100%; border: none; background-color: #ffffff; cursor: pointer">${post.title}</td>
                 <td>${post.writer}</td>
                 <td>${post.date}</td>
             </tr>
             `
-            });
+        });
 
             displayArea.innerHTML = html;
         })

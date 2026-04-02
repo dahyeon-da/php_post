@@ -1,7 +1,7 @@
 <?php
 require_once "../config.php";
 ?>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -111,6 +111,18 @@ require_once "../config.php";
             content: "\00d7";
             font-size: 14px;
         }
+        .star-checkbox {display: none;}
+        .flex {
+            margin-top: 10px;
+        }
+        .star-label {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 
@@ -133,8 +145,13 @@ require_once "../config.php";
                     삭제</button>
             </div>
 
+            <div class="flex">
+                <input type="checkbox" class="star-checkbox" id="star">
+                <label for="star" class="star-label">즐겨찾기 ☆</label>
+            </div>
+
             <div class="btn-group">
-                <button type="button" class="cancel-btn" onclick="location.href='/'">취소</button>
+                <button type="button" class="cancel-btn" onclick="location.href='/leedh/test/test_index.php'">취소</button>
                 <button type="button" class="submit-btn" onclick="modifyData()">수정하기</button>
             </div>
         </form>
@@ -145,6 +162,7 @@ require_once "../config.php";
         let fileInput = document.getElementById("file")
         let fileNameDisplay = document.getElementById("file-name");
         let btnCloseDisplay = document.querySelector('#btn-close');
+        let star;
 
         // 게시글 번호를 파라미터 값으로 가져오기
         let urlParams = '';
@@ -168,6 +186,9 @@ require_once "../config.php";
                         document.querySelector("input[name='writer']").value = res.data.writer;
                         document.querySelector("textarea[name='content']").value = res.data.content;
                         document.getElementById("file-name").textContent = res.data.file_name;
+                        star = res.data.star_on_off;
+
+                        starIsChecked(star);
 
                         if (res.data.file_name) {
                             btnCloseDisplay.style.display = 'inline-block';
@@ -212,14 +233,12 @@ require_once "../config.php";
             formData.append('content', document.querySelector("textarea[name='content']").value);
             formData.append('post_seq', post_seq);
             formData.append('org_file_name', org_file_name);
+            formData.append('star_on_off', star);
 
             if (fileInput.files[0] == undefined) {
                 formData.append('file_status', 'keep');
-                console.log(formData.get('file_status'));
-                console.log("새로운 파일 없음");
             } else {
                 formData.append('file_status', 'changed');
-                console.log("새로운 파일 있음");
             }
 
             fetch('./api/test_edit_api.php', {
@@ -234,7 +253,33 @@ require_once "../config.php";
                         alert(res.message);
                     }
                 })
+            .catch((e) => {
+                console.log(e);
+            })
         }
+
+        function starIsChecked(isChecked) {
+            const $label = $('.star-checkbox').siblings('.star-label');
+        
+            if(isChecked) {
+            $label.html("즐겨찾기 ★").css("color", "#FFFFFF;");
+           } else {
+            $label.html("즐겨찾기 ☆").css("color", "#FFFFFF;");
+           }
+        }
+        // 즐겨찾기 버튼 클릭 시 채워진 별로 변경
+        $(document).on('change', '.star-checkbox', function() {
+           const isChecked = $(this).is(':checked');
+           const $label = $(this).siblings('.star-label');
+           
+           if(isChecked) {
+            $label.html("즐겨찾기 ★").css("color", "#FFFFFF;");
+            star = 1;
+           } else {
+            $label.html("즐겨찾기 ☆").css("color", "#FFFFFF;");
+            star=0;
+           }
+        });
     </script>
 
 </body>

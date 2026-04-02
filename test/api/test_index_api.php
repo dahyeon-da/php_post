@@ -1,7 +1,7 @@
 <?php
 require_once('../../config.php');
 
-$sql = 'SELECT * FROM post_table;';
+$sql = 'SELECT * FROM post_table ORDER BY star_on_off DESC, date DESC;';
 
 try {
     $result = $DB->selectAll($sql);
