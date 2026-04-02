@@ -10,35 +10,62 @@ $data = json_decode($data, true);
 $username = $data['username'];
 $password = $data['password'];
 $email = $data['email'];
+$user_id = $data['user_id'];
 
-$require_once = ('../../.env');
-$password = hash($hash_val, $password);
-
-$array = array(
-    'username' => $username,
-    'password' => $password,
-    'email' => $email
-);
-$sql = 'INSERT INTO user_table(username, password, email) VALUES(:username, :password, :email);';
+$password = hash('sha256', $password);
 
 try {
-    $result = $DB->insert($sql, $array);
-
-    $resultData = array(
-        'result' => 'success',
-        'message' => 'Success Register'
+    $array = array(
+        'user_id' => $user_id
     );
-    $_SESSION['username'] = $username;
+    $sql = 'select COUNT(*) FROM user_table WHERE user_id=:user_id;';
+    $result = $DB->selectAll($sql, $array);
+    $count = (int)$result[0]['COUNT(*)'];
 
-    $resultData = json_encode($resultData);
-    echo $resultData;
+    if ($count == 0) {
+        try {
+            // 회원가입 내용을 DB에 넣기위한 array, sql 변수
+            $array = array(
+                'username' => $username,
+                'password' => $password,
+                'email' => $email,
+                'user_id' => $user_id
+            );
+            $sql = 'INSERT INTO user_table(username, password, email, user_id) VALUES(:username, :password, :email, :user_id);';
+            $result = $DB->insert($sql, $array);
+
+            $_SESSION['user_id'] = $user_id;
+
+            $resultData = array(
+                'result' => 'success',
+                'message' => 'Success Register'
+            );
+            $_SESSION['username'] = $username;
+            
+
+            $resultData = json_encode($resultData);
+            echo $resultData;
+        } catch (Exception $e) {
+            $resultData = array(
+                'result' => 'error',
+                'message' => 'Failed Register'
+            );
+
+            echo json_encode($resultData);
+        }
+    } else {
+        $resultData = array(
+            'result' => 'duplication', 
+            'message' => '중복된 ID가 있습니다.'
+        );
+
+        echo json_encode($resultData);
+    }
 } catch (Exception $e) {
     $resultData = array(
-        'result' => 'error', 
-        'message' => 'Failed Register'
+        'result' => 'error',
+        'message' => $e->getMessage()
     );
 
     echo json_encode($resultData);
 }
-
-?>

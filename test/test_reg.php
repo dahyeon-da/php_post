@@ -32,7 +32,7 @@ require_once "../config.php";
         }
 
         .signup-box input {
-            width: 100%;
+            width: 93%;
             padding: 10px;
             margin: 8px 0;
             border: 1px solid #ddd;
@@ -73,7 +73,8 @@ require_once "../config.php";
     <div class="signup-box">
         <h2>회원가입</h2>
         <form onsubmit="return validateForm()">
-            <input type="text" name="username" placeholder="아이디" required>
+            <input type="text" name="user_id" placeholder="아이디" required>
+            <input type="text" name="username" placeholder="이름" required>
             <input type="password" name="password" placeholder="비밀번호" required>
             <input type="password" name="confirm_password" placeholder="비밀번호 확인" required>
             <input type="email" name="email" placeholder="이메일" required>
@@ -109,6 +110,7 @@ require_once "../config.php";
                 method: 'POST',
                 body: JSON.stringify({
                     username: document.querySelector('input[name="username"]').value,
+                    user_id: document.querySelector('input[name="user_id"]').value,
                     password: document.querySelector('input[name="password"]').value,
                     email: document.querySelector('input[name ="email"]').value
                 })

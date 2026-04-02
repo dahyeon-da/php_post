@@ -73,7 +73,7 @@ require_once "../config.php";
     <div class="login-box">
         <h2>로그인</h2>
         <form>
-            <input type="text" name="username" placeholder="아이디" required>
+            <input type="text" name="user_id" placeholder="아이디" required>
             <input type="password" name="password" placeholder="비밀번호" required>
             <button type="button" class="login-btn" onclick="fetchData()">로그인</button>
         </form>
@@ -93,7 +93,7 @@ require_once "../config.php";
                 {
                     method: 'POST', 
                     body: JSON.stringify({
-                        username: document.querySelector('input[name="username"]').value,
+                        user_id: document.querySelector('input[name="user_id"]').value,
                         password: document.querySelector('input[name="password"]').value
                     })
                 }
